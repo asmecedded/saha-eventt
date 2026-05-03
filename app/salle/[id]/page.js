@@ -13,11 +13,10 @@ export default async function SalleDetailsPage({ params }) {
   // Fetch reserved dates to show availability
   const { data: reservations } = await supabase
     .from('reservations')
-    .select('date_evenement')
+    .select('date_evenement, statut')
     .eq('salle_id', id)
-    .neq('statut', 'Refusé')
     
-  const datesIndisponibles = reservations ? reservations.map(r => r.date_evenement).sort() : []
+  const datesIndisponibles = reservations ? reservations.filter(r => r.statut !== 'Refusé').map(r => r.date_evenement).sort() : []
 
   if (error || !salle) {
     return (

@@ -2,6 +2,7 @@
 import { supabase } from '../../lib/supabase'
 import { useSearchParams } from 'next/navigation'
 import { useState, useEffect, Suspense } from 'react'
+import Calendar from '../components/Calendar'
 
 function ReservationForm() {
   const searchParams = useSearchParams()
@@ -12,6 +13,7 @@ function ReservationForm() {
   const [reservationId, setReservationId] = useState(null)
   const [fileNameDisplay, setFileNameDisplay] = useState("")
   const [datesIndisponibles, setDatesIndisponibles] = useState([])
+  const [selectedDate, setSelectedDate] = useState("")
 
   useEffect(() => {
     if (salleId) {
@@ -22,12 +24,15 @@ function ReservationForm() {
   async function fetchDatesIndisponibles() {
     const { data } = await supabase
       .from('reservations')
-      .select('date_evenement')
+      .select('date_evenement, statut')
       .eq('salle_id', salleId)
-      .neq('statut', 'Refusé')
     
     if (data) {
-      setDatesIndisponibles(data.map(d => d.date_evenement))
+      // Filtrer pour ne garder que celles qui ne sont pas refusées
+      const datesBloquees = data
+        .filter(r => r.statut !== 'Refusé')
+        .map(r => r.date_evenement);
+      setDatesIndisponibles(datesBloquees);
     }
   }
 
@@ -35,7 +40,11 @@ function ReservationForm() {
     e.preventDefault()
     
     const formData = new FormData(e.target)
-    const selectedDate = formData.get('date')
+
+    if (!selectedDate) {
+      alert("Veuillez sélectionner une date sur le calendrier.")
+      return
+    }
 
     if (datesIndisponibles.includes(selectedDate)) {
       alert("Désolé, cette date est déjà réservée ou en attente de validation. Veuillez choisir une autre date.")
@@ -166,18 +175,13 @@ function ReservationForm() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Date de l'Événement</label>
-              <input 
-                name="date" 
-                type="date" 
-                required 
-                className="w-full px-5 py-4 bg-slate-50 border border-slate-200 text-slate-900 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" 
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Sélectionnez la Date de l'Événement</label>
+              <Calendar 
+                selectedDate={selectedDate} 
+                onSelectDate={setSelectedDate} 
+                datesIndisponibles={datesIndisponibles} 
               />
-              {datesIndisponibles.length > 0 && (
-                <div className="mt-2 text-xs text-red-600 bg-red-50 p-2 rounded-lg border border-red-100">
-                  <span className="font-semibold">⚠️ Dates indisponibles :</span> {datesIndisponibles.map(d => new Date(d).toLocaleDateString('fr-FR')).join(', ')}
-                </div>
-              )}
+              <input type="hidden" name="date" value={selectedDate} required />
             </div>
           </div>
           

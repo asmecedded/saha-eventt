@@ -3,20 +3,26 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase'; // Correction du chemin
 
 export default function AdminDashboard() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
+  const [authError, setAuthError] = useState(false);
+
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    fetchReservations();
-  }, []);
+    if (isAuthenticated) {
+      fetchReservations();
+    }
+  }, [isAuthenticated]);
 
   async function fetchReservations() {
     setLoading(true);
     const { data } = await supabase
       .from('reservations')
       .select('*')
-      .order('created_at', { ascending: false });
+      .order('id', { ascending: false });
     setReservations(data || []);
     setLoading(false);
   }
@@ -44,6 +50,48 @@ export default function AdminDashboard() {
     res.id.toString().includes(searchQuery) || 
     res.nom_client.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    if (password === 'admin123') {
+      setIsAuthenticated(true);
+      setAuthError(false);
+    } else {
+      setAuthError(true);
+    }
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-[calc(100vh-80px)] bg-slate-50 flex flex-col items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white rounded-[2rem] shadow-xl p-8 border border-slate-100">
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 shadow-sm">👑</div>
+            <h1 className="text-2xl font-bold text-slate-900">Espace Administrateur</h1>
+            <p className="text-slate-500 mt-2">Veuillez entrer le mot de passe pour accéder au tableau de bord et valider les paiements CCP.</p>
+          </div>
+          <form onSubmit={handleLogin} className="space-y-6">
+            <div>
+              <input 
+                type="password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Mot de passe" 
+                className="w-full px-5 py-4 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-center tracking-widest font-mono"
+              />
+              {authError && <p className="text-red-500 text-sm mt-2 text-center font-medium">Mot de passe incorrect.</p>}
+            </div>
+            <button 
+              type="submit" 
+              className="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-md transition-all hover:-translate-y-1"
+            >
+              Se Connecter
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 py-10 px-4 sm:px-6 lg:px-8">
