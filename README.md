@@ -1,36 +1,31 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚀 Saha Event App
 
-## Getting Started
+Ce dépôt contient l'application de gestion d'événements développée dans le cadre de l'examen pratique. L'application est déployée sur Vercel et utilise Supabase comme solution Backend-as-a-Service.
 
-First, run the development server:
+## 🔗 Liens du Projet
+* **Dépôt GitHub :** https://github.com/asmecedded/saha-eventt
+* **Site Web (Vercel) :** https://saha-eventt.vercel.app/
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🏛️ Mission 4 : Analyse d'Architecture
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 1. Mapping du Thème
+*Mon application permet de centraliser la gestion des salles et des réservations pour des événements.*
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+* **Table A (Salles) :** Répertorie les lieux disponibles (nom, description, prix).
+* **Table B (Réservations) :** Gère le planning et fait le lien entre utilisateurs et salles.
+* **Table C (Profiles) :** Stocke les données des utilisateurs enregistrés.
+* **Fichier (Images) :** Les photos illustrant les salles sont stockées dans le **Storage Supabase**.
 
-## Learn More
+### 2. Analyse d'Architecture (Réponses aux questions)
 
-To learn more about Next.js, take a look at the following resources:
+#### 💸 Pourquoi l'utilisation de Vercel + Supabase est financièrement plus logique qu'un serveur classique ?
+Cette architecture privilégie un modèle **OPEX** (Dépenses opérationnelles). Contrairement à un serveur classique qui demande un **CAPEX** (Dépenses d'investissement) élevé (achat de serveurs physiques, installation, maintenance matérielle), Vercel et Supabase permettent de payer uniquement ce que l'on consomme. Cela réduit les coûts initiaux et les risques financiers.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+#### 📈 Comment Vercel gère-t-il la scalabilité par rapport à un Data Center physique local ?
+Vercel utilise une infrastructure **Serverless** répartie sur un réseau mondial (Edge Network). Dans un Data Center physique local, une montée en charge nécessiterait d'ajouter manuellement des serveurs "racks", d'ajuster la climatisation et de gérer la bande passante. Vercel, lui, distribue automatiquement les ressources nécessaires de façon virtuelle et instantanée pour absorber n'importe quel pic de trafic.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+#### 📊 Dans l'application, qu'est-ce qui représente la donnée Structurée et Non-structurée ?
+* **Donnée Structurée :** Ce sont les données organisées dans les tables SQL de la base de données (ex: prix, noms, dates). Elles suivent un schéma strict (lignes et colonnes).
+* **Donnée Non-structurée :** Ce sont les fichiers bruts qui n'ont pas de structure de table, comme les **images des salles** ou les fichiers PDF, stockés séparément dans le Bucket (Storage).
