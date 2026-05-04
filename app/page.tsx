@@ -1,7 +1,7 @@
 import { supabase } from '../lib/supabase'
 import SearchBar from './components/SearchBar'
 
-export default async function Home({ searchParams }) {
+export default async function Home({ searchParams }: { searchParams: any }) {
   const params = await searchParams;
   const searchTerm = params?.search?.toLowerCase() || '';
 
@@ -9,8 +9,8 @@ export default async function Home({ searchParams }) {
   const { data: allSalles, error } = await supabase.from('salles').select('*').order('nom')
 
   // On filtre si une recherche est active (ville, ID ou nom)
-  const salles = allSalles?.filter(salle => 
-    !searchTerm || 
+  const salles = allSalles?.filter(salle =>
+    !searchTerm ||
     salle.adresse?.toLowerCase().includes(searchTerm) ||
     salle.id?.toLowerCase().includes(searchTerm) ||
     salle.nom?.toLowerCase().includes(searchTerm)
@@ -26,7 +26,7 @@ export default async function Home({ searchParams }) {
       </div>
     );
   }
-  
+
   return (
     <>
       {/* Hero Section */}
@@ -49,7 +49,7 @@ export default async function Home({ searchParams }) {
           <p className="mt-4 text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
             Trouvez et réservez facilement la salle parfaite pour votre mariage, conférence ou événement privé en Algérie avec Saha-Event.
           </p>
-          
+
           {/* Barre de recherche par ID intégrée */}
           <SearchBar />
         </div>
@@ -65,23 +65,23 @@ export default async function Home({ searchParams }) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {salles && salles.length > 0 ? (
             salles.map((salle) => (
-              <div 
-                key={salle.id} 
+              <div
+                key={salle.id}
                 className="group bg-white rounded-3xl overflow-hidden border border-slate-200/60 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 flex flex-col h-full"
               >
                 <div className="relative h-64 overflow-hidden">
                   <a href={`/salle/${salle.id}`} className="block w-full h-full">
-                    <img 
-                      src={salle.image_url || 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=800&auto=format&fit=crop'} 
-                      alt={salle.nom} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out cursor-pointer" 
+                    <img
+                      src={salle.image_url || 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=800&auto=format&fit=crop'}
+                      alt={salle.nom}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out cursor-pointer"
                     />
                   </a>
                   <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-md px-4 py-1.5 rounded-full text-sm font-bold text-slate-800 shadow-sm border border-white/20">
                     👥 {salle.capacite} pers.
                   </div>
                 </div>
-                
+
                 <div className="p-8 flex flex-col flex-grow">
                   <div className="flex justify-between items-start mb-3 gap-2">
                     <a href={`/salle/${salle.id}`} className="hover:text-blue-600 transition-colors">
@@ -91,17 +91,17 @@ export default async function Home({ searchParams }) {
                       <span className="shrink-0 px-2.5 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full border border-green-200">Disponible</span>
                     ) : null}
                   </div>
-                  
+
                   <p className="text-slate-500 mb-2 flex items-center gap-2 text-sm font-medium">
                     <span className="text-blue-500 text-lg">📍</span> {salle.adresse || 'Algérie'}
                   </p>
-                  
+
                   {salle.telephone && (
                     <p className="text-slate-500 mb-8 flex items-center gap-2 text-sm font-medium">
                       <span className="text-blue-500 text-lg">📞</span> {salle.telephone}
                     </p>
                   )}
-                  
+
                   <div className="mt-auto pt-6 border-t border-slate-100 flex items-center justify-between">
                     <div>
                       <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">À partir de</p>
@@ -109,15 +109,15 @@ export default async function Home({ searchParams }) {
                         {salle.prix.toLocaleString('fr-DZ')} <span className="text-sm font-medium text-slate-500">DZD/J</span>
                       </p>
                     </div>
-                    
+
                     <div className="flex gap-2">
-                      <a 
+                      <a
                         href={`/salle/${salle.id}`}
                         className="inline-flex items-center justify-center px-4 py-3 bg-white border border-slate-200 text-slate-700 text-sm font-bold rounded-xl hover:bg-slate-50 transition-all duration-300"
                       >
                         Détails
                       </a>
-                      <a 
+                      <a
                         href={`/reserver?salle=${salle.id}`}
                         className="inline-flex items-center justify-center px-6 py-3 bg-blue-50 text-blue-700 text-sm font-bold rounded-xl hover:bg-blue-600 hover:text-white transition-all duration-300"
                       >
